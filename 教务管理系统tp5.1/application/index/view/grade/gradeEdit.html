@@ -1,0 +1,112 @@
+{extend name="public/base"/}
+
+{block name="header"}
+{/block}
+
+{block name="menu"}
+{/block}
+
+{block name="seo"}
+<title>{$title|default="页面标题"}</title>
+<meta name="keywords" content="{$keywords|default='页面关键字'}">
+<meta name="description" content="{$desc|default='页面描述'}">
+</head>
+<body>
+{/block}
+
+{block name="content"}
+<article class="cl pd-20">
+	<form action="" method="post" class="form form-horizontal" id="form-admin-add">
+		<input type="hidden" name="id" value="{$grade_info.id}">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>班级名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$grade_info.name}"  id="name" name="name">
+				<p id="username" style="color:red"></p>
+			</div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>年限：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$grade_info.length}"  id="length" name="length">
+				<p id="length" style="color:red"></p>
+			</div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>学费：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$grade_info.price}"  id="price" name="price">
+				<p id="price" style="color:red"></p>
+			</div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>授课教师：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$teacher}"  id="teacher" name="teacher">
+				<p id="time" style="color:red"></p>
+			</div>
+		</div>
+
+		{eq name="$Think.session.user_info.name" value="admin"}
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">启用状态：</label>
+			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="role" size="1">
+					<option value="1" selected>启用</option>
+					<option value="0">不启用</option>
+				</select>
+				</span> </div>
+		</div>
+		{/eq}
+
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary radius" id="submit" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</article>
+{/block}
+
+{block name="js"}
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/validate-methods.js"></script> 
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<script>
+	$(function(){
+
+		//教师是不可以更改的
+		$('#teacher').attr("disabled",true);
+		//数据没有改变时，提交按钮是被禁用的，点击是没有用的
+		$('#submit').attr("disabled",true);
+		$("form").children().change(function(){
+          $('#submit').attr("disabled",false);
+	 });
+
+
+
+		$('#submit').on('click',function(){
+			 $.ajax({
+			 	 type:"POST",
+			 	 url :"{:url('grade/gradeUpdate')}",
+			 	 data: $('#form-admin-add').serialize(),
+			 dataType:'json',
+			 success :function(data){
+                 if(data.status==1){
+                    alert(data.message);
+                    window.location.href="{:url('user/adminList')}";
+                 }else{
+                    alert(data.message);
+                    window.location.href="{:url('user/adminAdd')}";
+                  }
+			   }
+			});
+		})
+   })
+	 
+</script>
+{/block}

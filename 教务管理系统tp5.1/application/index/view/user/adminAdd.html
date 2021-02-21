@@ -1,0 +1,150 @@
+{extend name="public/base"/}
+
+{block name="header"}
+{/block}
+
+{block name="menu"}
+{/block}
+
+{block name="seo"}
+<title>{$title|default="页面标题"}</title>
+<meta name="keywords" content="{$keywords|default='页面关键字'}">
+<meta name="description" content="{$desc|default='页面描述'}">
+</head>
+<body>
+{/block}
+
+{block name="content"}
+<article class="cl pd-20">
+	<form action="" method="post" class="form form-horizontal" id="form-admin-add">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>管理员：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="name" name="name">
+				<p id="username" style="color:red"></p>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>密码：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="password" class="input-text" autocomplete="off" value="" placeholder="密码" id="password" name="password">
+				
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">启用状态：</label>
+			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="role" size="1">
+					<option value="1" selected>启用</option>
+					<option value="0">不启用</option>
+				</select>
+				</span> </div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>邮箱：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" placeholder="@" name="email" id="email">
+				<p id="useremail" style="color: red;"></p>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">角色：</label>
+			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box" style="width:150px;">
+				<select class="select" name="role" size="1">
+					<option value="1">超级管理员</option>
+					<option value="0" selected>管理员</option>
+				</select>
+				</span> </div>
+		</div>
+		
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary radius"  id="submit" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</article>
+{/block}
+
+{block name="js"}
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/validate-methods.js"></script> 
+<script type="text/javascript" src="__STATIC__/lib/jquery.validation/1.14.0/messages_zh.js"></script> 
+
+<script>
+  $(function(){
+        //内容伪变化时,提交按钮默认为禁用状态
+        $('#submit').attr("disabled",true);
+
+        $("form").children().change(function(){
+           $('#submit').attr('disabled',false);
+     });
+
+  	 //失去焦点时检查用户是否重复
+      $("#name").blur(function(){
+      	  var name=$(this).val();
+      	  
+      	   $.ajax({
+              type:"GET",
+              url : "{:url('user/chechUsername')}",
+              data: {name:name},
+          dataType: "json",
+          success : function(data){
+               if(data.status==1){
+               	   //alert(data.message);
+                  $('#username').text(data.message).fadeOut(3000);
+                  //window.location.reload();
+               }else{
+               	   //alert(data.message);
+               	  $('#username').text(data.message).fadeOut(3000);
+               	   //window.location.reload();
+               }
+            }
+      	 });
+      });
+
+       //检查邮箱是否存在
+      $("#email").blur(function(){
+      	   var email=$(this).val();
+      	   $.ajax({
+              type:"GET",
+              url : "{:url('user/chechUseremail')}",
+              data: {email:email},
+          dataType: "json",
+          success : function(data){
+               if(data.status==1){
+               	   //alert(data.message);
+                  $('#useremail').text(data.message).fadeOut(3000);
+               }else{
+               	   //alert(data.message);
+               	  $('#useremail').text(data.message).fadeOut(3000);
+               }
+            }
+      	 });
+      });
+
+      //提交添加新用户
+      $('#submit').on('click',function(){
+      	   $.ajax({
+            type: "POST",
+            url : "{:url('user/userAdd')}",
+            data: $('#form-admin-add').serialize(),
+        dataType: 'json',
+         success: function(data){
+              if(data.status==1){
+                 alert(data.message);
+                 window.location.href="{:url('user/adminlist')}";
+            }else{
+            	alert(data.message);
+            	window.location.href="{:url('user/adminAdd')}";
+            }
+         }
+      });
+    })
+ })
+</script>
+{/block}
+
+
