@@ -52,7 +52,8 @@ class User  extends  Base
                      
                      //获取模型中的原始数据的所有信息，返回的二维数组
                      Session::set('user_info',$user->getData()); //返回的二维数组
-                      
+                     
+                     //用户登录成功后对数据库的数据进行更新
                      UserModel::where('id',$user->id)->update(['login_time'=>Session::get('time'),'login_count'=>$user->login_count+1]);
                       
                      return ["status"=>1,'message'=>'登录成功！']; 
